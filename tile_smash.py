@@ -2,6 +2,12 @@
 
 import numpy as np
 
+# Using mod-4 arithmetic for cardinal directions
+def rotate_by(card, r):
+    n = [((c + r) % 4) for c in card]
+    n.sort()
+    return tuple(n)
+
 # Simulation parameters
 deck_reps = 10
 game_reps = 10
@@ -13,15 +19,13 @@ cards_drawn = 3
 # Deck design
 #
 # Cards:
-#   d: dead end
-#   l: left
-#   s: straight
-#   r: right
-#   ls, lr, sr, lsr: combinations
-deck_contents = { 'd': 10,
-                  'l': 5, 's': 5, 'r': 5,
-                  'ls': 5, 'lr': 5, 'sr': 5,
-                  'lsr': 15 }
+#   0: straight
+#   1: left
+#   3: right
+deck_contents = { tuple(): 10,
+                  (0,): 5, (1,): 5, (3,): 5,
+                  (0,1): 5, (0,3): 5, (1,3): 5,
+                  (0,1,3): 15 }
 
 for deck_rep in range(deck_reps):
     deck = []
@@ -32,6 +36,11 @@ for deck_rep in range(deck_reps):
     for game_rep in range(game_reps):
         print(deck_rep, game_rep)
         np.random.shuffle(deck)
+
+        # Initialize board
+        #
+        # Directions
+        placed = { (0,0): (0,) }
 
         deck_mut = deck.copy()
         while len(deck_mut) > 0:
@@ -45,3 +54,4 @@ for deck_rep in range(deck_reps):
                 draws = [d for d in draws if len(d) == most]
 
             print(draws)
+            print([rotate_by(c,1) for c in draws])
