@@ -3,10 +3,24 @@
 import numpy as np
 
 # Using mod-4 arithmetic for cardinal directions
+# 0: ( 1,  0)
+# 1: ( 0,  1)
+# 2: (-1,  0)
+# 3: ( 0, -1)
 def rotate_by(card, r):
     n = [((c + r) % 4) for c in card]
     n.sort()
     return tuple(n)
+def translate_by(loc, d):
+    x, y = loc
+    if d == 0:
+        return (x+1, y)
+    elif d == 1:
+        return (x, y+1)
+    elif d == 2:
+        return (x-1, y)
+    else:
+        return (x, y-1)
 
 # Simulation parameters
 deck_reps = 10
@@ -15,6 +29,8 @@ game_reps = 10
 # Game parameters
 favor_more = True
 cards_drawn = 3
+initial = { (0,0): (0,1,3) }
+exit = (-1,0)
 
 # Deck design
 #
@@ -38,9 +54,12 @@ for deck_rep in range(deck_reps):
         np.random.shuffle(deck)
 
         # Initialize board
-        #
-        # Directions
-        placed = { (0,0): (0,) }
+        placed = set()
+        open = []
+        for loc in initial:
+            placed.add(loc)
+            for dir in initial[loc]:
+                open.append((loc, dir))
 
         deck_mut = deck.copy()
         while len(deck_mut) > 0:
@@ -53,5 +72,20 @@ for deck_rep in range(deck_reps):
                 most = max([len(c) for c in draws])
                 draws = [d for d in draws if len(d) == most]
 
-            print(draws)
-            print([rotate_by(c,1) for c in draws])
+            # Redundant when added, but check before removing
+            np.random.shuffle(draws)
+            draw = draws[0]
+
+            while len(open) > 0:
+                np.random.shuffle(open)
+                loc, dir = open.pop()
+
+                # Can't place in a location with an existing tile
+                if loc in placed: continue
+
+                placed.add(loc)
+                for dir in rotate_by(darw, dir):
+                    open.append((loc, dir))
+
+        print(placed)
+        print(open)
