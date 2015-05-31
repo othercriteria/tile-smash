@@ -78,14 +78,15 @@ for deck_rep in range(deck_reps):
 
             while len(open) > 0:
                 np.random.shuffle(open)
-                loc, dir = open.pop()
+                open_loc, open_dir = open.pop()
+                place_loc = translate_by(open_loc, open_dir)
 
                 # Can't place in a location with an existing tile
-                if loc in placed: continue
+                if place_loc in placed: continue
 
-                placed.add(loc)
-                for dir in rotate_by(darw, dir):
-                    open.append((loc, dir))
+                placed.add(place_loc)
+                for dir in rotate_by(draw, open_dir):
+                    open.append((place_loc, dir))
+                break
 
-        print(placed)
-        print(open)
+        print(exit in placed)
