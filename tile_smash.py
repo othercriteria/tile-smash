@@ -23,11 +23,11 @@ def translate_by(loc, d):
         return (x, y-1)
 
 # Simulation parameters
-deck_reps = 10
-game_reps = 10
+deck_reps = 100
+game_reps = 100
 
 # Game parameters
-favor_more = True
+favor_more = False
 cards_drawn = 3
 initial = { (0,0): (0,1,3) }
 exit = (-1,0)
@@ -43,6 +43,7 @@ deck_contents = { tuple(): 10,
                   (0,1): 5, (0,3): 5, (1,3): 5,
                   (0,1,3): 15 }
 
+win = np.empty((deck_reps,game_reps))
 for deck_rep in range(deck_reps):
     deck = []
     for card in deck_contents:
@@ -50,7 +51,6 @@ for deck_rep in range(deck_reps):
         deck.extend([card] * count)
         
     for game_rep in range(game_reps):
-        print(deck_rep, game_rep)
         np.random.shuffle(deck)
 
         # Initialize board
@@ -89,4 +89,9 @@ for deck_rep in range(deck_reps):
                     open.append((place_loc, dir))
                 break
 
-        print(exit in placed)
+        win[deck_rep,game_rep] = exit in placed
+
+n = deck_reps * game_reps
+p = np.mean(win)
+print('Grand win probability: %.2f +/- %.2f' %
+      (p, 1.96 * np.sqrt(p * (1-p) / n)))
